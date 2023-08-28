@@ -1,14 +1,29 @@
+import cv2
+import numpy as np
 def detect_inconsistent_texture(image):
-    # Verificar áreas de alta e baixa resolução
-    # Implemente um algoritmo para analisar a variação de resolução na imagem.
-    # Por exemplo, você pode usar detecção de borda ou análise de frequência.
+    # Carregar a imagem em escala de cinza
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+    # Aplicar o filtro de detecção de borda (por exemplo, Canny)
+    edges = cv2.Canny(image, threshold, threshold * 2)
+
+    # Calcular a porcentagem de pixels ativos nas bordas
+    edge_percentage = np.sum(edges) / (image.shape[0] * image.shape[1]) * 100
+
+    # Definir um limiar para detectar textura inconsistente
+    if edge_percentage > 10:  # Ajuste o limiar conforme necessário
+        return True
+    else:
+        return False
 
 def detect_repetitive_patterns(image):
+    return true
     # Verificar padrões repetitivos
     # Use técnicas de processamento de imagem para identificar padrões repetitivos,
     # como transformada de Fourier, detecção de linhas, detecção de borda, etc.
 
 def detect_vibrant_colors(image):
+    return true
     # Verificar uso intenso de cores vivas e contrastantes
     # Analise a distribuição de cores na imagem e identifique áreas com cores
     # vibrantes e alto contraste em relação ao fundo.
