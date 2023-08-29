@@ -53,30 +53,54 @@ def detect_vibrant_colors(image, threshold=17):
         return True #Posivo gerada por IA!!
     else:
         return False
+def resolutionChecker(image):
+        width, height, _ = image.shape
+        if width == 1024 and height == 1024:
+            print("1024x1024 Positivo")
+            return True
+        else:
+            return False
+
+
 
 def main(image_path):
     # Carregar a imagem
     image = cv2.imread(image_path)
-
+    weight = 0
     # Realizar as detecções
     inconsistent_texture = detect_inconsistent_texture(image)
     repetitive_patterns = detect_repetitive_patterns(image)
     vibrant_colors = detect_vibrant_colors(image)
+    resolutionAnalysis = resolutionChecker(image)
 
     # Imprimir resultados
-    if inconsistent_texture:
+    if inconsistent_texture: #FEITO CALIBRAGEM PARA IA
         print("Textura inconsistente detectada.")
+        weight = weight + 0.25
+        #adicionar peso de probabilidade de que ela possa ser uma IA.
 
 
     if repetitive_patterns: #FEITO CALIBRAGEM PARA IA
         print("Padrões repetitivos detectados.")
+        weight = weight + 0.25
         #adicionar peso de probabilidade que ela pode ser uma IA.
 
 
     if vibrant_colors: #FEITO CALIBRAGEM PARA IA
         print("Uso intenso de cores vivas e contrastantes detectado.")
+        weight = weight + 0.15
         #adicionar peso de probabilidade que ela pode ser uma IA.
 
-# Caminho da imagem a ser analisada
-caminho_da_imagem = "images_data_base\\ia.jpg"
+    if resolutionAnalysis:
+        print("Detectado Resolucao Suspeita")
+        weight = weight + 0.50
+
+    print("a probabilidade da imagem ser uma IA é de aproximadamente:", weight*100,"%")
+    if weight > 0.50:
+        print("A imagem provavelmente foi gerada por IA")
+    else:
+        print("A imagem provavelmente nao foi gerada por IA")
+    # Caminho da imagem a ser analisada
+
+caminho_da_imagem = "images_data_base\\noite.jpg"
 main(caminho_da_imagem)
