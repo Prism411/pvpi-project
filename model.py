@@ -17,7 +17,7 @@ def detect_inconsistent_texture(image, threshold=5000, limit=5):
     else:
         return False
 
-def detect_repetitive_patterns(image, threshold=8):
+def detect_repetitive_patterns(image, threshold=4):
     # Converter a imagem em escala de cinza
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -76,31 +76,49 @@ def main(image_path):
     # Imprimir resultados
     if inconsistent_texture: #FEITO CALIBRAGEM PARA IA
         print("Textura inconsistente detectada.")
-        weight = weight + 0.25
+        weight = weight + 0.25000
         #adicionar peso de probabilidade de que ela possa ser uma IA.
 
 
     if repetitive_patterns: #FEITO CALIBRAGEM PARA IA
         print("Padrões repetitivos detectados.")
-        weight = weight + 0.25
+        weight = weight + 0.2500
         #adicionar peso de probabilidade que ela pode ser uma IA.
 
 
     if vibrant_colors: #FEITO CALIBRAGEM PARA IA
         print("Uso intenso de cores vivas e contrastantes detectado.")
-        weight = weight + 0.15
+        weight = weight + 0.1500
         #adicionar peso de probabilidade que ela pode ser uma IA.
 
     if resolutionAnalysis:
         print("Detectado Resolucao Suspeita")
-        weight = weight + 0.50
+        weight = weight + 0.5005
 
     print("a probabilidade da imagem ser uma IA é de aproximadamente:", weight*100,"%")
     if weight > 0.50:
         print("A imagem provavelmente foi gerada por IA")
+        return True
     else:
         print("A imagem provavelmente nao foi gerada por IA")
+        return False
     # Caminho da imagem a ser analisada
 
-caminho_da_imagem = "images_data_base\\noite.jpg"
-main(caminho_da_imagem)
+
+geradaporIA = 0
+imagemNatural = 0
+i = 1
+for i in range(1,128):
+    caminho_da_imagem = "images_data_base\\real_images\\real ({0}).jpg".format(i)
+    print("Carregando Imagem: real ({0})".format(i))
+
+    imagem = main(caminho_da_imagem)
+
+    if imagem:
+        geradaporIA += 1
+    else:
+        imagemNatural += 1
+
+    print("Imagem geradas por IA:", geradaporIA)
+    print("Imagem Natural:", imagemNatural)
+
