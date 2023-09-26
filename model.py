@@ -13,7 +13,7 @@ def detect_inconsistent_texture(image, threshold=5000, limit=5):
     print(edge_percentage)
     # Definir um limiar para detectar textura inconsistente
     if edge_percentage < threshold:
-        return True #da flag na IA.
+        return True #Da flag na IA.
     else:
         return False
 
@@ -108,7 +108,7 @@ def main(image_path):
 geradaporIA = 0
 imagemNatural = 0
 i = 1
-for i in range(1,128):
+for i in range(1,130):
     caminho_da_imagem = "images_data_base\\real_images\\real ({0}).jpg".format(i)
     print("Carregando Imagem: real ({0})".format(i))
 
