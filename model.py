@@ -63,7 +63,7 @@ def resolutionChecker(image):
 
 
 
-def main(image_path):
+def iaChecker(image_path):
     # Carregar a imagem
     image = cv2.imread(image_path)
     weight = 0
@@ -97,28 +97,28 @@ def main(image_path):
 
     print("a probabilidade da imagem ser uma IA é de aproximadamente:", weight*100,"%")
     if weight > 0.50:
-        print("A imagem provavelmente foi gerada por IA")
+        ##print("A imagem provavelmente foi gerada por IA")
         return True
     else:
-        print("A imagem provavelmente nao foi gerada por IA")
+        ##("A imagem provavelmente nao foi gerada por IA")
         return False
     # Caminho da imagem a ser analisada
 
 
-geradaporIA = 0
-imagemNatural = 0
-i = 1
-for i in range(1,130):
-    caminho_da_imagem = "images_data_base\\real_images\\real ({0}).jpg".format(i)
-    print("Carregando Imagem: real ({0})".format(i))
+##geradaporIA = 0
+##imagemNatural = 0
+##i = 1
 
-    imagem = main(caminho_da_imagem)
+##
+##for i in range(1,130):
+  ##  caminho_da_imagem = "images_data_base\\real_images\\real ({0}).jpg".format(i)
+    ##print("Carregando Imagem: real ({0})".format(i))
 
-    if imagem:
-        geradaporIA += 1
-    else:
-        imagemNatural += 1
+  ##  if imagem:
+    ##    geradaporIA += 1
+  ##  else:
+   ##     imagemNatural += 1
 
-    print("Imagem geradas por IA:", geradaporIA)
-    print("Imagem Natural:", imagemNatural)
+    ##print("Imagem geradas por IA:", geradaporIA)
+    ##print("Imagem Natural:", imagemNatural)
 
