@@ -62,11 +62,15 @@ def resolutionChecker(image):
             return False
 
 
+import cv2
+
 
 def iaChecker(image_path):
     # Carregar a imagem
     image = cv2.imread(image_path)
     weight = 0
+    output_string = ""
+
     # Realizar as detecções
     inconsistent_texture = detect_inconsistent_texture(image)
     repetitive_patterns = detect_repetitive_patterns(image)
@@ -74,36 +78,33 @@ def iaChecker(image_path):
     resolutionAnalysis = resolutionChecker(image)
 
     # Imprimir resultados
-    if inconsistent_texture: #FEITO CALIBRAGEM PARA IA
-        print("Textura inconsistente detectada.")
+    if inconsistent_texture:  # FEITO CALIBRAGEM PARA IA
+        output_string += "Textura inconsistente detectada.\n"
         weight = weight + 0.25000
-        #adicionar peso de probabilidade de que ela possa ser uma IA.
+        # adicionar peso de probabilidade de que ela possa ser uma IA.
 
-
-    if repetitive_patterns: #FEITO CALIBRAGEM PARA IA
-        print("Padrões repetitivos detectados.")
+    if repetitive_patterns:  # FEITO CALIBRAGEM PARA IA
+        output_string += "Padrões repetitivos detectados.\n"
         weight = weight + 0.2500
-        #adicionar peso de probabilidade que ela pode ser uma IA.
+        # adicionar peso de probabilidade que ela pode ser uma IA.
 
-
-    if vibrant_colors: #FEITO CALIBRAGEM PARA IA
-        print("Uso intenso de cores vivas e contrastantes detectado.")
+    if vibrant_colors:  # FEITO CALIBRAGEM PARA IA
+        output_string += "Uso intenso de cores vivas e contrastantes detectado.\n"
         weight = weight + 0.1500
-        #adicionar peso de probabilidade que ela pode ser uma IA.
+        # adicionar peso de probabilidade que ela pode ser uma IA.
 
     if resolutionAnalysis:
-        print("Detectado Resolucao Suspeita")
+        output_string += "Detectado Resolucao Suspeita\n"
         weight = weight + 0.5005
 
-    print("a probabilidade da imagem ser uma IA é de aproximadamente:", weight*100,"%")
-    if weight > 0.50:
-        ##print("A imagem provavelmente foi gerada por IA")
-        return True
-    else:
-        ##("A imagem provavelmente nao foi gerada por IA")
-        return False
-    # Caminho da imagem a ser analisada
+    output_string += f"A probabilidade da imagem ser uma IA é de aproximadamente: {weight * 100}%\n"
 
+    if weight > 0.50:
+        output_string += "A imagem provavelmente foi gerada por IA"
+        return True, output_string
+    else:
+        output_string += "A imagem provavelmente não foi gerada por IA"
+        return False, output_string
 
 ##geradaporIA = 0
 ##imagemNatural = 0

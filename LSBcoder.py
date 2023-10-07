@@ -69,11 +69,14 @@ image = cv2.imread(image_path)
 secret_data = identifier
 
 # Escondendo os dados
-image_with_hidden_data = hide_data(image.copy(), secret_data)
-cv2.imwrite('teste_imagem.png', image_with_hidden_data)
+#image_with_hidden_data = hide_data(image.copy(), secret_data)
+#cv2.imwrite('teste_imagem.png', image_with_hidden_data)
 
 # Recuperando os dados
+image_with_hidden_data = cv2.imread('teste_imagem.png')
 retrieved_data = reveal_data(image_with_hidden_data)
+print("Mensagem recuperada:", retrieved_data)
+
 print("Mensagem recuperada:", retrieved_data)
 print("Natural Identifier = ", naturalIdentifier(retrieved_data, image_path))
 print("Original Identifier = ", naturalIdentifier(identifier, image_path))
