@@ -27,8 +27,8 @@ A Plataforma de Verificação e Proteção de Imagens (PVPI) é um sistema que c
   
 ## Como Usar?
 1. Clone o Repositorio ou Baixe o projeto.
-2. Instale todas as bibliotecas necessarias
-3. Use uma IDE que tenha como compilar codigos em Python 3.x
+2. Instale todas as bibliotecas necessarias.
+3. Use uma IDE que tenha como compilar codigos em Python 3.x.
 4. Para o funcionamento deste projeto é recomendado usar a IDE Pycharm Community.
 5. O Aplicativo é executado compilado o Main, dentro da pasta "program".
 6. Escolha uma pasta que tenha imagens .jpg ou .png, ao enviar a imagem para testar em outro computador é interessante enviar o metadado .tjpg junto!
