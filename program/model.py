@@ -10,7 +10,7 @@ def detect_inconsistent_texture(image, threshold=5000, limit=5):
 
     # Calcular a porcentagem de pixels ativos nas bordas
     edge_percentage = np.sum(edges) / (image.shape[0] * image.shape[1]) * 100
-    print(edge_percentage)
+    #print(edge_percentage)
     # Definir um limiar para detectar textura inconsistente
     if edge_percentage < threshold:
         return True #Da flag na IA.
@@ -28,7 +28,7 @@ def detect_repetitive_patterns(image, threshold=4):
     edge_percentage = np.sum(edges) / (image.shape[0] * image.shape[1])
 
     # Se a porcentagem for maior que o limiar, considerar como padrão repetitivo
-    print(edge_percentage)
+    #print(edge_percentage)
     if edge_percentage < threshold:
         return True #da flag que ela pode ser gerada por ia
     else:
@@ -47,7 +47,7 @@ def detect_vibrant_colors(image, threshold=17):
 
     # Calcular a porcentagem de pixels vibrantes na imagem
     vibrant_percentage = np.sum(mask == 255) / (image.shape[0] * image.shape[1]) * 100
-    print(vibrant_percentage)
+    #print(vibrant_percentage)
     # Se a porcentagem for maior que o limiar, considerar como uso intenso de cores vibrantes
     if vibrant_percentage > threshold or vibrant_percentage < 1.0:
         return True #Posivo gerada por IA!!
@@ -56,7 +56,7 @@ def detect_vibrant_colors(image, threshold=17):
 def resolutionChecker(image):
         width, height, _ = image.shape
         if width == 1024 and height == 1024:
-            print("1024x1024 Positivo")
+            #print("1024x1024 Positivo")
             return True
         else:
             return False

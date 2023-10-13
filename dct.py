@@ -115,7 +115,7 @@ def main():
     # Decodifique os dados na imagem
     decoded_data = decode_fixed_length(encoded_image, message_length)
 
-    print("Dados decodificados:", decoded_data)
+    #print("Dados decodificados:", decoded_data)
 
 
 def convert_image(args):

@@ -38,11 +38,11 @@ def addTrack(image):
     # Se o número serial da placa mãe já estiver no tracking, não inserir-lo
     for t in track:
         if t == motherboardNumber:
-            print("MESMO DONO, ENCERRANDO APLICACAO!")
+           # print("MESMO DONO, ENCERRANDO APLICACAO!")
             return
 
 
-    print("Dono Diferente, Colocando dentro!")
+    #print("Dono Diferente, Colocando dentro!")
     # Número inicial igual 5, volta para número 2, recomeçando o tracking
     if number == 5:
         number = 1

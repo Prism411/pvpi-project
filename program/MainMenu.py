@@ -1,17 +1,16 @@
 import sys
 import os
+from concurrent.futures import ThreadPoolExecutor
+
 from PIL import Image
-import cv2
-import numpy as np  # Certifique-se de importar numpy aqui
+from PySide6.QtCore import QRect, QSize, QMetaObject, QCoreApplication, Qt
+from PySide6.QtGui import QPixmap, QIcon, QFont, QColor, QPalette
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QScrollArea, QVBoxLayout, QGridLayout, QWidget,
     QLabel, QMessageBox, QFrame, QLineEdit, QPushButton, QFileDialog, QGraphicsView, QGraphicsScene,
-    QStatusBar, QTextEdit, QDialog
-)
-from PySide6.QtGui import QPixmap, QIcon, QFont, QColor, QPalette
-from PySide6.QtCore import QRect, QSize, QMetaObject, QCoreApplication, Qt
-from concurrent.futures import ThreadPoolExecutor
-from codigo import *
+    QStatusBar, QTextEdit, QDialog )
+
+
 from codificar import *
 from dct import jpg_to_png, hide_data_with_delimiter, decode_fixed_length, is_logical_string
 from model import iaChecker
@@ -42,8 +41,6 @@ def set_dark_theme(app):
     dark_palette.setColor(QPalette.Disabled, QPalette.Light, QColor(53, 53, 53))
     app.setPalette(dark_palette)
     app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
-import os
-from concurrent.futures import ThreadPoolExecutor
 
 #multithreading para melhorar o desempenho.
 #imput
@@ -56,41 +53,39 @@ from concurrent.futures import ThreadPoolExecutor
 #cv2.imwrite('teste_imagem.jpg', image_with_hidden_data)
 
 cod = codificar()
+message_length = 10
 def process_image(file_name, directory):
     if file_name.endswith(".png"):
         file_path = os.path.join(directory, file_name)
-        print("NOME DA IMAGEM ESCOLHIDA: " + file_name)
 
         tjpg_path = file_path[:-4] + ".tjpg"
         if os.path.exists(tjpg_path):
-            print("O arquivo .tjpg já existe!")
-            addTrack(tjpg_path)  # Assumindo que esta função está definida em outro lugar
-            print("Foi Adicionado!")
-            tjpg_text = tjpg_to_jpg(tjpg_path)  # Assumindo que esta função está definida em outro lugar
-            formatted_info = format_trackers_from_tjpg(tjpg_text)  # Assumindo que esta função está definida em outro lugar
+            addTrack(tjpg_path)
+            tjpg_text = tjpg_to_jpg(tjpg_path)
+            formatted_info = format_trackers_from_tjpg(tjpg_text)
             # Use formatted_info conforme necessário
         else:
-            print("O arquivo .tjpg não existe! Então verificando a imagem original...")
-            jpg_to_tjpg(file_path)
+            jpg_to_tjpg(file_path, cod)
             image = Image.open(file_path)
 
             # Tente decodificar os dados na imagem
             try:
-                decoded_data = decode_fixed_length(image, 9)  # tente decodificar uma string de comprimento fixo
+                decoded_data = decode_fixed_length(image, message_length)
             except Exception as e:
-                print(f"Erro ao decodificar dados: {e}")
+                # Considerar logar o erro se necessário
+                pass
             else:
                 if is_logical_string(decoded_data, cod):
-                    print("A imagem já contém dados codificados lógicos.")
-                    print("Dados decodificados:", decoded_data)
+                    # A imagem já contém dados codificados lógicos.
                     # Aqui, você pode decidir não codificar novos dados, ou informar ao usuário, etc.
+                    pass
                 else:
-                    print("Nenhum dado codificado lógico encontrado. Codificando novos dados.")
-                    data_to_hide = cod  # Assumindo que esta função está definida em outro lugar
-                    image_with_hidden_data = hide_data_with_delimiter(image, data_to_hide)
+                    # Nenhum dado codificado lógico encontrado. Codificando novos dados.
+                    image_with_hidden_data = hide_data_with_delimiter(image, cod)
                     image_with_hidden_data.save(file_path, format='PNG')
-                    print("Dados codificados na imagem.")
+                    # Dados codificados na imagem.
             # Lógica adicional aqui, se necessário
+
 
 def process_images(directory):
     with ThreadPoolExecutor(max_workers=4) as executor:  # Ajuste max_workers conforme necessário
@@ -135,7 +130,6 @@ class ClickableImage(QLabel):
         tjpg_path = self.np_var[:-4] + ".tjpg"
         image = Image.open(self.np_var)
         encoded_image = Image.open(self.np_var)
-        message_length = 9
         decoded_data = decode_fixed_length(encoded_image, message_length)
         print("Dados decodificados:", decoded_data)
         # Lendo a imagem original
