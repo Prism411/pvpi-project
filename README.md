@@ -18,12 +18,12 @@ A Plataforma de Verificação e Proteção de Imagens (PVPI) é um sistema que c
 - WMI: Utilizada para interações com o WMI do Windows. Instale com pip install WMI.
   
     # Comandos:
-    pip install numpy.
-    pip install Pillow.
-    pip install PySide6.
-    pip install opencv-python.
-    pip install scipy.
-    pip install WMI.
+    - pip install numpy.
+    - pip install Pillow.
+    - pip install PySide6.
+    - pip install opencv-python.
+    - pip install scipy.
+    - pip install WMI.
   
 ## Como Usar?
 1. Clone o Repositorio ou Baixe o projeto.
