@@ -101,10 +101,10 @@ def iaChecker(image_path):
 
     if weight > 0.50:
         output_string += "A imagem provavelmente foi gerada por IA"
-        return True, output_string
+        return True, f"Prob. de IA: {weight * 100}%"
     else:
         output_string += "A imagem provavelmente não foi gerada por IA"
-        return False, output_string
+        return False,f"Prob. de IA: {weight * 100}%"
 
 ##geradaporIA = 0
 ##imagemNatural = 0

@@ -79,17 +79,17 @@ def iaChecker(image_path):
 
     # Imprimir resultados
     if inconsistent_texture:  # FEITO CALIBRAGEM PARA IA
-        output_string += "Textura inconsistente detectada.\n"
+        ##output_string += "Textura inconsistente detectada.\n"
         weight = weight + 0.25000
         # adicionar peso de probabilidade de que ela possa ser uma IA.
 
     if repetitive_patterns:  # FEITO CALIBRAGEM PARA IA
-        output_string += "Padrões repetitivos detectados.\n"
+        ##output_string += "Padrões repetitivos detectados.\n"
         weight = weight + 0.2500
         # adicionar peso de probabilidade que ela pode ser uma IA.
 
     if vibrant_colors:  # FEITO CALIBRAGEM PARA IA
-        output_string += "Uso intenso de cores vivas e contrastantes detectado.\n"
+        ##output_string += "Uso intenso de cores vivas e contrastantes detectado.\n"
         weight = weight + 0.1500
         # adicionar peso de probabilidade que ela pode ser uma IA.
 
@@ -101,11 +101,15 @@ def iaChecker(image_path):
 
     if weight > 0.50:
         output_string += "A imagem provavelmente foi gerada por IA"
-        return True, output_string
+        return True
     else:
         output_string += "A imagem provavelmente não foi gerada por IA"
-        return False, output_string
+        return False
 
+print(iaChecker("real8.jpg"))
+print(iaChecker("real8.png"))
+
+##Pode retornar tambem o output string
 ##geradaporIA = 0
 ##imagemNatural = 0
 ##i = 1

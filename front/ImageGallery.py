@@ -1,9 +1,14 @@
 import sys
 import os
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QScrollArea, QVBoxLayout,
-                             QGridLayout, QWidget, QLabel, QMessageBox, QFrame)
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QScrollArea, QVBoxLayout,
+    QGridLayout, QWidget, QLabel, QMessageBox, QFrame
+)
+from PySide6.QtGui import QPixmap
+from PySide6.QtCore import Qt
+
+# ... keep other parts of the code unchanged, just change PyQt5 to PySide6 ...
+
 
 
 class ClickableImage(QLabel):
@@ -88,4 +93,4 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     image_directory = "../images_data_base/real_images"
     gallery = ImageGallery(get_image_paths(image_directory))
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

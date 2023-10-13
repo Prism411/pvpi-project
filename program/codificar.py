@@ -1,11 +1,24 @@
+import hashlib
+
 import numpy as np
-from codigo import numero_placa_mae
+import subprocess
+import platform
 
-codigo = numero_placa_mae()
+def numero_placa_mae():
+    operating_system = platform.system()
+    if operating_system == "Windows":
+        command = 'wmic baseboard get serialnumber'
 
-tam = len(codigo)
-vet = []  
+        try:
+            result = subprocess.check_output(command, shell=True, text=True)
+            motherboard_number = result.strip().split('\n')[2].strip()
+            return motherboard_number
+        except subprocess.CalledProcessError as e:
+            return None
+    else:
+        return None
 
+# Verifica se o número é primo
 def is_prime(num):
     if num <= 1:
         return False
@@ -20,6 +33,7 @@ def is_prime(num):
         i += 6
     return True
 
+# Cria uma sequência de números primos
 def prime_sequence(n):
     sequence = []
     num = 2
@@ -29,27 +43,33 @@ def prime_sequence(n):
         num += 1
     return sequence
 
-def fill_matrix_with_primes():
+# Cria uma chave do tamanho da placa-mãe com os números primos
+def fill_matrix_with_primes(tam):
     prime_numbers = prime_sequence(tam * tam)
     key = np.array(prime_numbers).reshape((tam, tam))
     return key
 
-def cripto(): 
+# Faz a multiplicação do código ASCII com a chave e cria um código criptografado
+def cripto():
     vet_aux = []
+    codigo = numero_placa_mae()
+    tam = len(codigo)
+    vet = []
     for i, v in enumerate(codigo):
         x = ord(v)
         vet.append(x)
         vet_aux.append(x)
 
-    result_matrix = fill_matrix_with_primes()
+    result_matrix = fill_matrix_with_primes(tam)
     vet_np = np.array(vet_aux)
     result_vector = np.dot(result_matrix, vet_np)
     return result_vector
 
-
-def nume_binary(lista_numeros):
+# Transforma o código criptografado em uma sequência binária
+def nume_binary():
+    cript = cripto()
     binary_sequence = []
-    for numero in lista_numeros:
+    for numero in cript:
         binary = bin(numero)[2:]
         len_bi = len(binary)
         rlen_bi = bin(len_bi)[2:]
@@ -58,31 +78,19 @@ def nume_binary(lista_numeros):
         binary_sequence.append(binary)
     return binary_sequence
 
-def lista_para_string(lista):
-    return ''.join(lista)
-
 def seq_bin():
+    binary_sequence = nume_binary()
+    return ''.join(binary_sequence)
+
+def bin_to_10_letter_word(binary_string):
+    # Calcular o hash MD5 da sequência binária (pode ser usado outro algoritmo de hash)
+    hash_value = hashlib.md5(binary_string.encode()).hexdigest()
+
+    # Selecionar os primeiros 10 caracteres do hash para formar a palavra
+    ten_letter_word = hash_value[:10]
+
+    return ten_letter_word
+def codificar():
+    x = seq_bin()
+    output_string = bin_to_10_letter_word(x)
     return output_string
-
-
-cript= cripto()
-binary_sequence = nume_binary(cript)
-output_string = lista_para_string(binary_sequence)
-
-key = fill_matrix_with_primes()
-seq_bin()
-
-print("KEY: ")
-print(key)
-print()
-print("Codigo ASCII")
-print(vet)
-print()
-print("Codigo Criptografado")
-print(cript)
-print()
-print("sequncia binaria com o tamanho")
-print(binary_sequence)
-print()
-print("sequncia binaria STR")
-print(output_string)

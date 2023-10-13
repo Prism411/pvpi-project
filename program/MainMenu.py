@@ -1,19 +1,23 @@
 import sys
 import os
-import numpy as np
+
+import cv2
+import numpy as np  # Certifique-se de importar numpy aqui
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QScrollArea, QVBoxLayout, QGridLayout, QWidget,
     QLabel, QMessageBox, QFrame, QLineEdit, QPushButton, QFileDialog, QGraphicsView, QGraphicsScene,
-    QStatusBar
+    QStatusBar, QTextEdit, QDialog
 )
 from PySide6.QtGui import QPixmap, QIcon, QFont, QColor, QPalette
 from PySide6.QtCore import QRect, QSize, QMetaObject, QCoreApplication, Qt
-
-from w.codigo import *
-from w.codificar import *
-from w.funcao import *
-from w.decodificar import *
-from w.esconder import *
+from concurrent.futures import ThreadPoolExecutor
+from codigo import *
+from codificar import *
+from dct import jpg_to_png
+from model import iaChecker
+from program.track.header_add_track import addTrack
+from program.track.jpg_to_tjpg import jpg_to_tjpg
+from program.track.tjpg_to_jpg import tjpg_to_jpg
 
 
 def set_dark_theme(app):
@@ -38,45 +42,114 @@ def set_dark_theme(app):
     dark_palette.setColor(QPalette.Disabled, QPalette.Light, QColor(53, 53, 53))
     app.setPalette(dark_palette)
     app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
+import os
+from concurrent.futures import ThreadPoolExecutor
 
+#multithreading para melhorar o desempenho.
+#imput
+#image_path = 'note.jpg'
+#image = cv2.imread(image_path)
+#secret_data = seq_bin()
 
+# Escondendo os dados
+#image_with_hidden_data = hide_data(image.copy(), secret_data)
+#cv2.imwrite('teste_imagem.jpg', image_with_hidden_data)
+
+def process_image(file_name, directory):
+    if file_name.endswith(".jpg"):
+        file_path = os.path.join(directory, file_name)
+        print("NOME DA IMAGEM ESCOLHIDA: " + file_name)
+
+        tjpg_path = file_path[:-4] + ".tjpg"
+        if os.path.exists(tjpg_path):
+            print("O arquivo .tjpg já existe!")
+            addTrack(tjpg_path)
+            print("Foi Adicionado!")
+            tjpg_text = tjpg_to_jpg(tjpg_path)
+            formatted_info = format_trackers_from_tjpg(tjpg_text)
+            # Use formatted_info conforme necessário
+        else:
+            print("O arquivo .tjpg não existe!")
+            jpg_to_tjpg(file_path)
+            #hide_data(image, codificar)
+            #cv2.imwrite(file_path, image)
+            print("Foi criado!")
+            # Lógica adicional aqui, se necessário
+
+def process_images(directory):
+    with ThreadPoolExecutor(max_workers=4) as executor:  # Ajuste max_workers conforme necessário
+        # Submeta todas as tarefas ao executor
+        futures = [executor.submit(process_image, file_name, directory) for file_name in os.listdir(directory)]
+        # Espere até que todas sejam concluídas
+        for future in futures:
+            future.result()  # Pode adicionar tratamento de exceções aqui
+
+class InfoDialog(QDialog):
+    def __init__(self, text, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Informações da Imagem")
+
+        # Crie um layout vertical
+        layout = QVBoxLayout()
+
+        # Crie um QTextEdit para exibir o texto
+        text_edit = QTextEdit(self)
+        text_edit.setPlainText(text)
+        text_edit.setReadOnly(True)
+
+        # Adicione o QTextEdit ao layout
+        layout.addWidget(text_edit)
+
+            # Defina o layout para o diálogo
+        self.setLayout(layout)
 class ClickableImage(QLabel):
-    def __init__(self, pixmap, info, parent=None):
+    def __init__(self, pixmap, info, idunico, np_var, parent=None):
         super(ClickableImage, self).__init__(parent)
         self.setPixmap(pixmap)
         self.info = info
+        self.idunico = idunico
+        self.np_var = np_var
 
     def mousePressEvent(self, event):
         self.show_info()
 
-    def show_info(self):
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Information)
-        msg.setText(self.info)
-        msg.setWindowTitle("Informações da Imagem")
-        msg.setStyleSheet("""
-            QMessageBox {
-                background-color: #353535;
-            }
-            QLabel{
-                color: #ffffff;
-            }
-            QPushButton {
-                color: #ffffff;
-                background-color: #353535;
-                border-style: outset;
-                border-width: 2px;
-                border-radius: 10px;
-                border-color: #2a82da;
-                font: bold 14px;
-                padding: 6px;
-            }
-            QPushButton:pressed {
-                background-color: #2a82da;
-                border-style: inset;
-            }
-        """)
-        msg.exec_()
+    # ...
+    def show_info(self, info_text=None):
+        print("NOME DA IMAGEM ESCOLHIDA: " + self.np_var)
+        tjpg_path = self.np_var[:-4] + ".tjpg"
+
+        # Lendo a imagem original
+        #image = cv2.imread(self.np_var)
+
+        # Escondendo a mensagem na imagem
+        #image_with_hidden_data = hide_data(image, codificar())
+
+        # Salvando a imagem com a mensagem escondida
+        # Aqui, substitua 'output_image_path' pelo caminho onde você deseja salvar a nova imagem
+        #output_image_path = self.np_var  # substitua pelo seu caminho desejado
+        #cv2.imwrite(output_image_path, image_with_hidden_data, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+
+        # Lendo a imagem com dados escondidos
+        #image_with_data = cv2.imread(output_image_path)
+
+        # Revelando a mensagem
+        #print("msg escondida: " + reveal_data(image_with_data))
+
+        tjpg_text = tjpg_to_jpg(tjpg_path)
+        formatted_info = format_trackers_from_tjpg(tjpg_text)
+
+        # Inicialize info_text como uma string vazia se for None
+        if info_text is None:
+            info_text = ""
+
+        info_text += formatted_info
+
+        # Crie um texto com as informações restantes
+        info_text += "\nFLAG IA = " + str(iaChecker(self.np_var))
+
+        # Crie e exiba o diálogo personalizado
+        info_dialog = InfoDialog(info_text, self)
+        info_dialog.exec()
 
 
 class ImageGallery(QMainWindow):
@@ -84,7 +157,6 @@ class ImageGallery(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Galeria de Imagens")
-
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.layout = QVBoxLayout()
@@ -113,7 +185,7 @@ class ImageGallery(QMainWindow):
             """)
             frame_layout = QVBoxLayout(frame)
 
-            img_label = ClickableImage(pixmap.scaled(150, 150, Qt.KeepAspectRatio), image_info)
+            img_label = ClickableImage(pixmap.scaled(150, 150, Qt.KeepAspectRatio), image_info, "",img_path)
             frame_layout.addWidget(img_label, alignment=Qt.AlignCenter)
             self.scroll_layout.addWidget(frame, row, col)
 
@@ -121,7 +193,6 @@ class ImageGallery(QMainWindow):
             if col >= 3:
                 col = 0
                 row += 1
-
         self.show()
 
 
@@ -225,12 +296,21 @@ class MainWindow(QMainWindow, Ui_PVPI):
     def on_buttonClick(self):
         directory = QFileDialog.getExistingDirectory(self, "Selecionar diretório")
         self.lineEdit.setText(directory)  # exibe o diretório selecionado no campo de texto
+        process_images(directory)
         self.openImageGallery(directory)
 
     def openImageGallery(self, directory):
+        jpg_to_png(directory)
         if os.path.exists(directory):
-            image_paths = [os.path.join(directory, f) for f in os.listdir(directory) if
-                           os.path.isfile(os.path.join(directory, f))]
+            # Lista de extensões de arquivo de imagem válidas
+            valid_image_extensions = [".jpg", ".jpeg", ".png", ".bmp", ".tiff",
+                                      ".gif"]  # você pode adicionar ou remover tipos de arquivo conforme necessário
+
+            # Obtém todos os arquivos no diretório e filtra por extensões de arquivo de imagem
+            image_paths = [os.path.join(directory, f) for f in os.listdir(directory)
+                           if os.path.isfile(os.path.join(directory, f)) and any(
+                    f.lower().endswith(ext) for ext in valid_image_extensions)]
+
             if image_paths:
                 self.gallery = ImageGallery(image_paths)
                 self.gallery.show()
@@ -241,31 +321,48 @@ class MainWindow(QMainWindow, Ui_PVPI):
             QMessageBox.warning(self, "Diretório não encontrado", "O diretório selecionado não existe.")
 
 
+def format_trackers_from_tjpg(tjpg_text):
+    # Divide o texto usando '#' como delimitador para obter os trackers individuais
+    trackers = tjpg_text.split('#')
+
+    # Inicializa uma lista para armazenar as informações formatadas dos trackers
+    formatted_trackers = []
+
+    # Processa cada tracker individual
+    for tracker in trackers:
+        # Divide o tracker usando '|' como delimitador
+        parts = tracker.split('|')
+
+        # Verifica se há informações suficientes (pelo menos 2 partes)
+        if len(parts) >= 2:
+            # Primeira parte: Número total de usuários
+            num_users = parts[0]
+
+            # Segunda parte: Informações dos usuários
+            user_info = parts[1:]
+
+            # Formata as informações para exibição
+            formatted_tracker = f"Número Total de Usuários: {num_users}\n"
+            formatted_tracker += "\n".join([f"Usuário {i + 1}: {info}" for i, info in enumerate(user_info)])
+
+            # Adiciona o tracker formatado à lista
+            formatted_trackers.append(formatted_tracker)
+
+    # Verifica se há algum tracker formatado
+    if formatted_trackers:
+        # Retorna a lista de informações dos trackers formatadas como uma string
+        return "\n\nInformações dos Trackers:\n\n" + "\n\n".join(formatted_trackers)
+    else:
+        # Retorna uma mensagem se nenhum tracker for encontrado
+        return "\n\nNenhum Tracker encontrado."
+
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     set_dark_theme(app)
     mainWin = MainWindow()
-    cript = cripto()
-    binary_sequence = nume_binary(cript)
-    output_string = lista_para_string(binary_sequence)
 
-    key = fill_matrix_with_primes()
-    seq_bin()
-
-    print("KEY: ")
-    print(key)
-    print()
-    print("Codigo ASCII")
-    print(vet)
-    print()
-    print("Codigo Criptografado")
-    print(cript)
-    print()
-    print("sequncia binaria com o tamanho")
-    print(binary_sequence)
-    print()
-    print("sequncia binaria STR")
-    print(output_string)
     mainWin.show()
 
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

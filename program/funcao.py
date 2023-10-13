@@ -1,6 +1,5 @@
 import numpy as np
-from codificar import cripto,fill_matrix_with_primes,seq_bin
-from esconder import return_data
+from codificar import fill_matrix_with_primes
 
 def lu_decomposition(A):
     n = len(A)

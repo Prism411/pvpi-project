@@ -1,11 +1,6 @@
 import numpy as np
 from codigo import numero_placa_mae
 
-codigo = numero_placa_mae()
-
-tam = len(codigo)
-vet = []  
-
 def is_prime(num):
     if num <= 1:
         return False
@@ -29,19 +24,22 @@ def prime_sequence(n):
         num += 1
     return sequence
 
-def fill_matrix_with_primes():
+def fill_matrix_with_primes(tam):
     prime_numbers = prime_sequence(tam * tam)
     key = np.array(prime_numbers).reshape((tam, tam))
     return key
 
-def cripto(): 
+def cripto():
     vet_aux = []
+    codigo = numero_placa_mae()
+    tam = len(codigo)
+    vet = []
     for i, v in enumerate(codigo):
         x = ord(v)
         vet.append(x)
         vet_aux.append(x)
 
-    result_matrix = fill_matrix_with_primes()
+    result_matrix = fill_matrix_with_primes(tam)
     vet_np = np.array(vet_aux)
     result_vector = np.dot(result_matrix, vet_np)
     return result_vector
@@ -64,24 +62,10 @@ def lista_para_string(lista):
 def seq_bin():
     return output_string
 
+
 cript= cripto()
 binary_sequence = nume_binary(cript)
 output_string = lista_para_string(binary_sequence)
 
 key = fill_matrix_with_primes()
 seq_bin()
-
-print("KEY: ")
-print(key)
-print()
-print("Codigo ASCII")
-print(vet)
-print()
-print("Codigo Criptografado")
-print(cript)
-print()
-print("sequncia binaria com o tamanho")
-print(binary_sequence)
-print()
-print("sequncia binaria STR")
-print(output_string)
