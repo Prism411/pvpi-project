@@ -1,6 +1,6 @@
 import sys
 import os
-
+from PIL import Image
 import cv2
 import numpy as np  # Certifique-se de importar numpy aqui
 from PySide6.QtWidgets import (
@@ -13,7 +13,7 @@ from PySide6.QtCore import QRect, QSize, QMetaObject, QCoreApplication, Qt
 from concurrent.futures import ThreadPoolExecutor
 from codigo import *
 from codificar import *
-from dct import jpg_to_png
+from dct import jpg_to_png, hide_data_with_delimiter, decode_fixed_length, is_logical_string
 from model import iaChecker
 from program.track.header_add_track import addTrack
 from program.track.jpg_to_tjpg import jpg_to_tjpg
@@ -55,25 +55,41 @@ from concurrent.futures import ThreadPoolExecutor
 #image_with_hidden_data = hide_data(image.copy(), secret_data)
 #cv2.imwrite('teste_imagem.jpg', image_with_hidden_data)
 
+cod = codificar()
 def process_image(file_name, directory):
-    if file_name.endswith(".jpg"):
+    if file_name.endswith(".png"):
         file_path = os.path.join(directory, file_name)
         print("NOME DA IMAGEM ESCOLHIDA: " + file_name)
 
         tjpg_path = file_path[:-4] + ".tjpg"
         if os.path.exists(tjpg_path):
             print("O arquivo .tjpg já existe!")
-            addTrack(tjpg_path)
+            addTrack(tjpg_path)  # Assumindo que esta função está definida em outro lugar
             print("Foi Adicionado!")
-            tjpg_text = tjpg_to_jpg(tjpg_path)
-            formatted_info = format_trackers_from_tjpg(tjpg_text)
+            tjpg_text = tjpg_to_jpg(tjpg_path)  # Assumindo que esta função está definida em outro lugar
+            formatted_info = format_trackers_from_tjpg(tjpg_text)  # Assumindo que esta função está definida em outro lugar
             # Use formatted_info conforme necessário
         else:
-            print("O arquivo .tjpg não existe!")
+            print("O arquivo .tjpg não existe! Então verificando a imagem original...")
             jpg_to_tjpg(file_path)
-            #hide_data(image, codificar)
-            #cv2.imwrite(file_path, image)
-            print("Foi criado!")
+            image = Image.open(file_path)
+
+            # Tente decodificar os dados na imagem
+            try:
+                decoded_data = decode_fixed_length(image, 9)  # tente decodificar uma string de comprimento fixo
+            except Exception as e:
+                print(f"Erro ao decodificar dados: {e}")
+            else:
+                if is_logical_string(decoded_data, cod):
+                    print("A imagem já contém dados codificados lógicos.")
+                    print("Dados decodificados:", decoded_data)
+                    # Aqui, você pode decidir não codificar novos dados, ou informar ao usuário, etc.
+                else:
+                    print("Nenhum dado codificado lógico encontrado. Codificando novos dados.")
+                    data_to_hide = cod  # Assumindo que esta função está definida em outro lugar
+                    image_with_hidden_data = hide_data_with_delimiter(image, data_to_hide)
+                    image_with_hidden_data.save(file_path, format='PNG')
+                    print("Dados codificados na imagem.")
             # Lógica adicional aqui, se necessário
 
 def process_images(directory):
@@ -117,7 +133,11 @@ class ClickableImage(QLabel):
     def show_info(self, info_text=None):
         print("NOME DA IMAGEM ESCOLHIDA: " + self.np_var)
         tjpg_path = self.np_var[:-4] + ".tjpg"
-
+        image = Image.open(self.np_var)
+        encoded_image = Image.open(self.np_var)
+        message_length = 9
+        decoded_data = decode_fixed_length(encoded_image, message_length)
+        print("Dados decodificados:", decoded_data)
         # Lendo a imagem original
         #image = cv2.imread(self.np_var)
 
@@ -140,7 +160,7 @@ class ClickableImage(QLabel):
 
         # Inicialize info_text como uma string vazia se for None
         if info_text is None:
-            info_text = ""
+            info_text = "CRIADOR ORIGINAL DA IMAGEM:" + decoded_data +"\n"
 
         info_text += formatted_info
 

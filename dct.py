@@ -2,6 +2,27 @@ from PIL import Image
 import binascii
 import os
 from multiprocessing import Pool
+import re
+
+cod = ()
+def is_logical_string(s, keyword):
+    # Verifica se a string pode ser codificada e decodificada em UTF-8 sem erros
+    try:
+        s = s.encode(encoding='utf-8').decode('utf-8')
+    except UnicodeDecodeError:
+        return False
+
+    # Verifica a presença de uma palavra-chave específica
+    if keyword.lower() in s.lower():
+        return True
+
+    # Verifica se a string contém um número excessivo de caracteres não alfanuméricos
+    if re.search(r'[^a-zA-Z0-9 ]', s):
+        non_alphanumeric_chars = len(re.findall(r'[^a-zA-Z0-9 ]', s))
+        if non_alphanumeric_chars > len(s) / 2:  # Se mais da metade dos caracteres são não alfanuméricos
+            return False
+
+    return True  # A string passou em todas as verificações
 
 # Function to convert text to binary
 def text_to_bin(text):
@@ -32,6 +53,7 @@ def modify_pixel(pixel, binary_data, data_index):
 
 # Function to hide data within the image
 def hide_data_with_delimiter(image, data):
+
     # Convert the data to binary and add the delimiter
     binary_data = text_to_bin(data) + '1111111111111110'  # Delimiter is 16 '1's followed by '0'
 
@@ -93,7 +115,7 @@ def main():
     # Decodifique os dados na imagem
     decoded_data = decode_fixed_length(encoded_image, message_length)
 
-    #print("Dados decodificados:", decoded_data)
+    print("Dados decodificados:", decoded_data)
 
 
 def convert_image(args):
