@@ -1,6 +1,9 @@
 import numpy as np
 from funcao import result
 
+
+
+# Não é usado no codigo, apenas para fins de DEBUG
 matriz_b = result()
 
 print()

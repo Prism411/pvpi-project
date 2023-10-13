@@ -91,7 +91,7 @@ def decode_fixed_length(image, length):
     return bin_to_text(binary_data)
 
 # Usage
-def main():
+#def main():
     # Carregue a imagem
     #img_path = 'real8.png'  # especifique o caminho para sua imagem PNG
     #image = Image.open(img_path)
@@ -103,17 +103,17 @@ def main():
     #image_with_hidden_data = hide_data_with_delimiter(image, data_to_hide)
 
     # Salve a nova imagem no formato PNG
-    output_image_path = 'real8_steganografed.png'  # especifique o caminho para a imagem de saída
+    #output_image_path = 'real8_steganografed.png'  # especifique o caminho para a imagem de saída
     #image_with_hidden_data.save(output_image_path, format='PNG')
 
     # Carregue a imagem com dados ocultos
-    encoded_image = Image.open(output_image_path)
+    #encoded_image = Image.open(output_image_path)
 
     # Sabemos que o comprimento da mensagem original é de 9 caracteres
-    message_length = 9
+    #message_length = 9
 
     # Decodifique os dados na imagem
-    decoded_data = decode_fixed_length(encoded_image, message_length)
+    #decoded_data = decode_fixed_length(encoded_image, message_length)
 
     #print("Dados decodificados:", decoded_data)
 
@@ -148,8 +148,8 @@ def jpg_to_png(directory):
 
 
 #jpg_to_png("C:\\Users\\jader\\Desktop\\estudos\\PROJETOALGEBRA\\pvpi-project\\program\\testeimg")
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+    #main()
 
 
 

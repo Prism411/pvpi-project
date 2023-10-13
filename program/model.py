@@ -67,6 +67,7 @@ import cv2
 
 def iaChecker(image_path):
     # Carregar a imagem
+    print("IACHECKEEEEEEEEEEEEEEEEEEEEER")
     image = cv2.imread(image_path)
     weight = 0
     output_string = ""

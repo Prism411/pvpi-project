@@ -8,11 +8,11 @@ from PySide6.QtGui import QPixmap, QIcon, QFont, QColor, QPalette
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QScrollArea, QVBoxLayout, QGridLayout, QWidget,
     QLabel, QMessageBox, QFrame, QLineEdit, QPushButton, QFileDialog, QGraphicsView, QGraphicsScene,
-    QStatusBar, QTextEdit, QDialog )
+    QStatusBar, QTextEdit, QDialog  )
 
 
 from codificar import *
-from dct import jpg_to_png, hide_data_with_delimiter, decode_fixed_length, is_logical_string
+from program.dct import jpg_to_png, hide_data_with_delimiter, decode_fixed_length, is_logical_string
 from model import iaChecker
 from program.track.header_add_track import addTrack
 from program.track.jpg_to_tjpg import jpg_to_tjpg
@@ -61,6 +61,7 @@ def process_image(file_name, directory):
         tjpg_path = file_path[:-4] + ".tjpg"
         if os.path.exists(tjpg_path):
             addTrack(tjpg_path)
+
             tjpg_text = tjpg_to_jpg(tjpg_path)
             formatted_info = format_trackers_from_tjpg(tjpg_text)
             # Use formatted_info conforme necessário

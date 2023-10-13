@@ -3,7 +3,7 @@ from scipy.linalg import lu
 import base64
 
 from idRetriever import get_motherboard_serial
-from model import iaChecker
+from program.model import iaChecker
 
 
 def getSerialNumber():
