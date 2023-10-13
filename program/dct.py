@@ -1,157 +1,130 @@
-from PIL import Image
-import binascii
-import os
-from multiprocessing import Pool
-import re
+# Importação das bibliotecas necessárias.
+from PIL import Image  # Para manipular imagens.
+import binascii  # Para conversões de binário para ASCII e vice-versa.
+import os  # Para interação com o sistema operacional.
+from multiprocessing import Pool  # Para processamento paralelo.
+import re  # Para usar expressões regulares.
 
-cod = ()
+cod = ()  # Uma tupla vazia, a utilização não está clara sem o resto do contexto do código.
+
+# Função que verifica se uma string é lógica baseada em várias condições.
 def is_logical_string(s, keyword):
-    # Verifica se a string pode ser codificada e decodificada em UTF-8 sem erros
+    # Tentativa de codificar e decodificar a string em UTF-8.
     try:
         s = s.encode(encoding='utf-8').decode('utf-8')
-    except UnicodeDecodeError:
+    except UnicodeDecodeError:  # Se houver um erro, a função retorna Falso.
         return False
 
-    # Verifica a presença de uma palavra-chave específica
+    # Verifica se a palavra-chave fornecida está presente na string.
     if keyword.lower() in s.lower():
         return True
 
-    # Verifica se a string contém um número excessivo de caracteres não alfanuméricos
+    # Procura por caracteres não alfanuméricos na string.
     if re.search(r'[^a-zA-Z0-9 ]', s):
         non_alphanumeric_chars = len(re.findall(r'[^a-zA-Z0-9 ]', s))
-        if non_alphanumeric_chars > len(s) / 2:  # Se mais da metade dos caracteres são não alfanuméricos
+        # Se mais da metade dos caracteres são não alfanuméricos, retorna Falso.
+        if non_alphanumeric_chars > len(s) / 2:
             return False
 
-    return True  # A string passou em todas as verificações
+    return True  # Se passar todas as verificações, retorna Verdadeiro.
 
-# Function to convert text to binary
+# Função para converter texto em binário.
 def text_to_bin(text):
+    # Converte cada caractere em sua representação binária e junta tudo em uma única string.
     binary_text = ''.join(format(ord(char), '08b') for char in text)
     return binary_text
 
-# Function to convert binary to text
+# Função para converter binário em texto.
 def bin_to_text(binary_data):
     str_data = ''
+    # Processa cada byte de dados binários (8 bits), converte em decimal e obtém o caractere correspondente.
     for i in range(0, len(binary_data), 8):
         temp_data = binary_data[i:i + 8]
         decimal_data = int(temp_data, 2)
         str_data = str_data + chr(decimal_data)
     return str_data
 
-# Function to modify the least significant bit of the pixel
+# Função para modificar o bit menos significativo do pixel.
 def modify_pixel(pixel, binary_data, data_index):
     modified_pixel = []
     for i in range(0, 3):
-        if data_index < len(binary_data):  # if there is still data to store, modify the pixel
-            pixel_bin = format(pixel[i], '08b')  # convert the pixel value to binary
-            new_pixel_bin = pixel_bin[:-1] + binary_data[data_index]  # replace the LSB with the data bit
-            modified_pixel.append(int(new_pixel_bin, 2))  # convert back to integer
+        if data_index < len(binary_data):  # Se ainda houver dados para armazenar, modifica o pixel.
+            pixel_bin = format(pixel[i], '08b')  # Converte o valor do pixel para binário.
+            new_pixel_bin = pixel_bin[:-1] + binary_data[data_index]  # Substitui o LSB com o bit de dados.
+            modified_pixel.append(int(new_pixel_bin, 2))  # Converte novamente para inteiro.
             data_index += 1
         else:
-            modified_pixel.append(pixel[i])  # no more data to store, leave the pixel as it is
+            modified_pixel.append(pixel[i])  # Se não houver mais dados, mantém o pixel inalterado.
     return tuple(modified_pixel), data_index
 
-# Function to hide data within the image
+# Função para ocultar dados na imagem.
 def hide_data_with_delimiter(image, data):
-
-    # Convert the data to binary and add the delimiter
-    binary_data = text_to_bin(data) + '1111111111111110'  # Delimiter is 16 '1's followed by '0'
+    # Converte os dados para binário e adiciona um delimitador.
+    binary_data = text_to_bin(data) + '1111111111111110'  # O delimitador é 16 '1's seguido por '0'.
 
     data_index = 0
 
+    # Percorre cada pixel da imagem.
     for x in range(image.width):
         for y in range(image.height):
-            pixel = image.getpixel((x, y))[:3]  # get the RGB values of the pixel (ignoring alpha)
-            modified_pixel, data_index = modify_pixel(pixel, binary_data, data_index)  # modify the pixel
-            image.putpixel((x, y), modified_pixel + (pixel[3:] if len(pixel) == 4 else ()))  # put the modified pixel back in the image
+            pixel = image.getpixel((x, y))[:3]  # Obtém os valores RGB do pixel (ignorando o alfa).
+            modified_pixel, data_index = modify_pixel(pixel, binary_data, data_index)  # Modifica o pixel.
+            # Coloca o pixel modificado de volta na imagem.
+            image.putpixel((x, y), modified_pixel + (pixel[3:] if len(pixel) == 4 else ()))
 
-            if data_index >= len(binary_data):  # if all data has been stored, return the image
+            # Se todos os dados foram armazenados, retorna a imagem.
+            if data_index >= len(binary_data):
                 return image
     return image
 
-# Function to decode data of a fixed length from the image
+# Função para decodificar dados de comprimento fixo da imagem.
 def decode_fixed_length(image, length):
     binary_data = ""
-    data_length = length * 8  # Each character is 8 bits
+    data_length = length * 8  # Cada caractere tem 8 bits.
 
+    # Extrai os bits menos significativos dos pixels da imagem até atingir o comprimento desejado.
     for x in range(image.width):
         for y in range(image.height):
-            pixel = image.getpixel((x, y))[:3]  # get the RGB values of the pixel (ignoring alpha)
+            pixel = image.getpixel((x, y))[:3]  # Obtém os valores RGB do pixel (ignorando o alfa).
             for color in pixel:
-                binary_data += (format(color, '08b')[-1])  # extract the LSB of each color channel
+                binary_data += (format(color, '08b')[-1])  # Extrai o LSB de cada canal de cor.
 
-            # If we've extracted the amount of data we want, break from the loop
             if len(binary_data) >= data_length:
                 break
         if len(binary_data) >= data_length:
             break
 
-    binary_data = binary_data[:data_length]  # Trim any excess data we've collected
+    binary_data = binary_data[:data_length]  # Remove quaisquer dados excessivos coletados.
 
-    return bin_to_text(binary_data)
+    return bin_to_text(binary_data)  # Converte os dados binários de volta para texto.
 
-# Usage
-#def main():
-    # Carregue a imagem
-    #img_path = 'real8.png'  # especifique o caminho para sua imagem PNG
-    #image = Image.open(img_path)
-
-    # Os dados a serem ocultados
-    #data_to_hide = "123456789"
-
-    # Oculte os dados na imagem
-    #image_with_hidden_data = hide_data_with_delimiter(image, data_to_hide)
-
-    # Salve a nova imagem no formato PNG
-    #output_image_path = 'real8_steganografed.png'  # especifique o caminho para a imagem de saída
-    #image_with_hidden_data.save(output_image_path, format='PNG')
-
-    # Carregue a imagem com dados ocultos
-    #encoded_image = Image.open(output_image_path)
-
-    # Sabemos que o comprimento da mensagem original é de 9 caracteres
-    #message_length = 9
-
-    # Decodifique os dados na imagem
-    #decoded_data = decode_fixed_length(encoded_image, message_length)
-
-    #print("Dados decodificados:", decoded_data)
-
-
+# Função para converter imagens.
 def convert_image(args):
-    directory, filename = args  # Desempacotando os argumentos
+    directory, filename = args  # Descompacta os argumentos.
 
-    jpg_path = os.path.join(directory, filename)
-    png_path = os.path.join(directory, os.path.splitext(filename)[0] + ".png")
+    jpg_path = os.path.join(directory, filename)  # Caminho completo para o arquivo JPG.
+    png_path = os.path.join(directory, os.path.splitext(filename)[0] + ".png")  # Caminho para o novo arquivo PNG.
 
     try:
-        with Image.open(jpg_path) as img:
-            img.save(png_path, 'PNG')
-        os.remove(jpg_path)
+        with Image.open(jpg_path) as img:  # Abre a imagem JPG.
+            img.save(png_path, 'PNG')  # Salva a imagem em formato PNG.
+        os.remove(jpg_path)  # Remove o arquivo JPG original.
         return f"{filename} convertido e excluído com sucesso."
-    except Exception as e:
+    except Exception as e:  # Em caso de erro, retorna uma mensagem.
         return f"Não foi possível converter {filename}: {e}"
 
+# Função para converter todas as imagens JPG em um diretório para PNG.
 def jpg_to_png(directory):
-    if not os.path.isdir(directory):
+    if not os.path.isdir(directory):  # Verifica se o diretório existe.
         #print("O diretório fornecido não existe.")
         return
 
-    # Recupera todos os arquivos .jpg no diretório
-    jpg_files = [(directory, f) for f in os.listdir(directory) if f.endswith('.jpg')]  # Agora, cada item é uma tupla
+    # Recupera todos os arquivos .jpg no diretório especificado.
+    jpg_files = [(directory, f) for f in os.listdir(directory) if f.endswith('.jpg')]  # Cada item é uma tupla.
 
-    # Usa um pool de processos para converter as imagens em paralelo
+    # Usa processamento paralelo para converter as imagens.
     with Pool() as pool:
-        pool.map(convert_image, jpg_files)
-        #for result in results:
-        #print(result)
-
-
-#jpg_to_png("C:\\Users\\jader\\Desktop\\estudos\\PROJETOALGEBRA\\pvpi-project\\program\\testeimg")
-#if __name__ == "__main__":
-    #main()
+        pool.map(convert_image, jpg_files)  # Converte as imagens.
 
 
 
-## a função asyncio.run() foi introduzida no Python 3.7, então você precisará de
-## Python 3.7 ou mais recente para usar este código como está.

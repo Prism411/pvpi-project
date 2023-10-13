@@ -42,22 +42,16 @@ def set_dark_theme(app):
     app.setPalette(dark_palette)
     app.setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
 
-#multithreading para melhorar o desempenho.
-#imput
-#image_path = 'note.jpg'
-#image = cv2.imread(image_path)
-#secret_data = seq_bin()
 
-# Escondendo os dados
-#image_with_hidden_data = hide_data(image.copy(), secret_data)
-#cv2.imwrite('teste_imagem.jpg', image_with_hidden_data)
-
+#Variaveis Globais para nao precisar Ficar Chamando toda hora
 cod = codificar()
 message_length = 10
-def process_image(file_name, directory):
+def process_image(file_name, directory): #Função principal que é chamada assim que inicia no diretorio.
+    #Verifica se a imagem é PNG para fazer a conversão para JPG
     if file_name.endswith(".png"):
         file_path = os.path.join(directory, file_name)
 
+    # Verifica se a imagem possui a extensão .tjpg
         tjpg_path = file_path[:-4] + ".tjpg"
         if os.path.exists(tjpg_path):
             addTrack(tjpg_path)
@@ -96,7 +90,7 @@ def process_images(directory):
         for future in futures:
             future.result()  # Pode adicionar tratamento de exceções aqui
 
-class InfoDialog(QDialog):
+class InfoDialog(QDialog): #Janelinha criada quando voce cria a imagem
     def __init__(self, text, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Informações da Imagem")
@@ -126,7 +120,7 @@ class ClickableImage(QLabel):
         self.show_info()
 
     # ...
-    def show_info(self, info_text=None):
+    def show_info(self, info_text=None): #Aqui Carrega as informações para mostrar na janelinha ao clicar na imagem
         print("NOME DA IMAGEM ESCOLHIDA: " + self.np_var)
         tjpg_path = self.np_var[:-4] + ".tjpg"
         image = Image.open(self.np_var)
@@ -160,14 +154,14 @@ class ClickableImage(QLabel):
         info_text += formatted_info
 
         # Crie um texto com as informações restantes
-        info_text += "\nFLAG IA = " + str(iaChecker(self.np_var))
+        info_text += "\nFLAG IA = " + str(iaChecker(self.np_var)) #Puxa a flag da imagem!
 
         # Crie e exiba o diálogo personalizado
         info_dialog = InfoDialog(info_text, self)
         info_dialog.exec()
 
 
-class ImageGallery(QMainWindow):
+class ImageGallery(QMainWindow): #Funcionamento da Galeria
     def __init__(self, image_paths):
         super().__init__()
 
@@ -190,7 +184,7 @@ class ImageGallery(QMainWindow):
         for img_path in image_paths:
             pixmap = QPixmap(img_path)
             image_info = os.path.basename(img_path)
-
+        #Caracteristicas do Frame
             frame = QFrame()
             frame.setStyleSheet("""
                 QFrame {
@@ -210,7 +204,7 @@ class ImageGallery(QMainWindow):
                 row += 1
         self.show()
 
-
+#Funcao principal
 class Ui_PVPI(object):
     def setupUi(self, PVPI):
         if not PVPI.objectName():
