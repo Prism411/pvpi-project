@@ -119,30 +119,14 @@ class ClickableImage(QLabel):
     def mousePressEvent(self, event):
         self.show_info()
 
-    # ...
-    def show_info(self, info_text=None): #Aqui Carrega as informações para mostrar na janelinha ao clicar na imagem
+    # Aqui Carrega as informações para mostrar na janelinha ao clicar na imagem
+    def show_info(self, info_text=None):
         print("NOME DA IMAGEM ESCOLHIDA: " + self.np_var)
         tjpg_path = self.np_var[:-4] + ".tjpg"
         image = Image.open(self.np_var)
         encoded_image = Image.open(self.np_var)
         decoded_data = decode_fixed_length(encoded_image, message_length)
         print("Dados decodificados:", decoded_data)
-        # Lendo a imagem original
-        #image = cv2.imread(self.np_var)
-
-        # Escondendo a mensagem na imagem
-        #image_with_hidden_data = hide_data(image, codificar())
-
-        # Salvando a imagem com a mensagem escondida
-        # Aqui, substitua 'output_image_path' pelo caminho onde você deseja salvar a nova imagem
-        #output_image_path = self.np_var  # substitua pelo seu caminho desejado
-        #cv2.imwrite(output_image_path, image_with_hidden_data, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-
-        # Lendo a imagem com dados escondidos
-        #image_with_data = cv2.imread(output_image_path)
-
-        # Revelando a mensagem
-        #print("msg escondida: " + reveal_data(image_with_data))
 
         tjpg_text = tjpg_to_jpg(tjpg_path)
         formatted_info = format_trackers_from_tjpg(tjpg_text)
@@ -161,30 +145,37 @@ class ClickableImage(QLabel):
         info_dialog.exec()
 
 
-class ImageGallery(QMainWindow): #Funcionamento da Galeria
+#Funcionamento da Galeria
+class ImageGallery(QMainWindow):
     def __init__(self, image_paths):
         super().__init__()
 
+        # Configurações iniciais da janela principal
         self.setWindowTitle("Galeria de Imagens")
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.layout = QVBoxLayout()
         self.central_widget.setLayout(self.layout)
 
+        # Configura um scroll area para permitir rolagem
         self.scroll_area = QScrollArea(self)
         self.scroll_area.setWidgetResizable(True)
         self.layout.addWidget(self.scroll_area)
 
+        # Cria um widget para o conteúdo rolável
         self.scroll_content = QWidget(self.scroll_area)
         self.scroll_layout = QGridLayout(self.scroll_content)
         self.scroll_content.setLayout(self.scroll_layout)
         self.scroll_area.setWidget(self.scroll_content)
 
+        # Itera sobre os caminhos das imagens
         row, col = 0, 0
         for img_path in image_paths:
+            # Carrega a imagem usando QPixmap
             pixmap = QPixmap(img_path)
             image_info = os.path.basename(img_path)
-        #Caracteristicas do Frame
+
+            # Cria um frame para a imagem com estilo personalizado
             frame = QFrame()
             frame.setStyleSheet("""
                 QFrame {
@@ -192,17 +183,25 @@ class ImageGallery(QMainWindow): #Funcionamento da Galeria
                     border-radius: 5px;
                 }
             """)
+
             frame_layout = QVBoxLayout(frame)
 
-            img_label = ClickableImage(pixmap.scaled(150, 150, Qt.KeepAspectRatio), image_info, "",img_path)
+            # Cria uma etiqueta de imagem clicável e a adiciona ao frame
+            img_label = ClickableImage(pixmap.scaled(150, 150, Qt.KeepAspectRatio), image_info, "", img_path)
             frame_layout.addWidget(img_label, alignment=Qt.AlignCenter)
+
+            # Adiciona o frame ao layout da área rolável
             self.scroll_layout.addWidget(frame, row, col)
 
+            # Atualiza as posições de coluna e linha
             col += 1
             if col >= 3:
                 col = 0
                 row += 1
+
+        # Exibe a janela
         self.show()
+
 
 #Funcao principal
 class Ui_PVPI(object):
@@ -216,6 +215,7 @@ class Ui_PVPI(object):
         self.centralwidget = QWidget(PVPI)
         self.centralwidget.setObjectName(u"centralwidget")
 
+        # Cria um rótulo (label) para o título
         self.label = QLabel(self.centralwidget)
         self.label.setObjectName(u"label")
         self.label.setGeometry(QRect(0, 10, 721, 81))
@@ -223,6 +223,7 @@ class Ui_PVPI(object):
         font.setPointSize(18)
         self.label.setFont(font)
 
+        # Cria um rótulo (label) para alguma descrição
         self.label_2 = QLabel(self.centralwidget)
         self.label_2.setObjectName(u"label_2")
         self.label_2.setGeometry(QRect(10, 160, 721, 81))
@@ -230,37 +231,46 @@ class Ui_PVPI(object):
         font1.setPointSize(12)
         self.label_2.setFont(font1)
 
+        # Cria um campo de entrada de texto (LineEdit)
         self.lineEdit = QLineEdit(self.centralwidget)
         self.lineEdit.setObjectName(u"lineEdit")
         self.lineEdit.setGeometry(QRect(450, 190, 150, 25))
 
+        # Cria um botão (PushButton)
         self.pushButton = QPushButton(self.centralwidget)
         self.pushButton.setObjectName(u"pushButton")
         self.pushButton.setGeometry(QRect(635, 190, 100, 25))
 
+        # Cria uma visualização gráfica (GraphicsView) com uma imagem
         self.graphicsView = QGraphicsView(self.centralwidget)
         self.graphicsView.setObjectName(u"graphicsView")
         self.graphicsView.setGeometry(QRect(240, 260, 358, 240))
 
+        # Cria uma cena gráfica (GraphicsScene) e adiciona uma imagem (pixmap)
         self.scene = QGraphicsScene(self.graphicsView)
         pixmap = QPixmap("iconqT.png")
         self.scene.addPixmap(pixmap)
         self.graphicsView.setScene(self.scene)
 
+        # Cria um rótulo (label) para algum texto
         self.label_3 = QLabel(self.centralwidget)
         self.label_3.setObjectName(u"label_3")
         self.label_3.setGeometry(QRect(230, 490, 400, 51))
 
+        # Configura o widget central na janela principal
         PVPI.setCentralWidget(self.centralwidget)
 
+        # Cria uma barra de status (StatusBar)
         self.statusbar = QStatusBar(PVPI)
         self.statusbar.setObjectName(u"statusbar")
         PVPI.setStatusBar(self.statusbar)
 
+        # Traduz as strings (rótulos, botões, etc.) para o idioma desejado
         self.retranslateUi(PVPI)
 
+        # Conecta os slots e sinais automaticamente (geralmente usado para eventos)
         QMetaObject.connectSlotsByName(PVPI)
-
+# Descricao dos Labels e Titulos
     def retranslateUi(self, PVPI):
         PVPI.setWindowTitle(QCoreApplication.translate("PVPI", u"PVPI", None))
         self.label.setText(QCoreApplication.translate("PVPI", u"     Bem-vindo a Plataforma PVPI", None))
@@ -269,11 +279,15 @@ class Ui_PVPI(object):
         self.label_3.setText(QCoreApplication.translate("PVPI", u"Feito com \u2764\ufe0f, Por Nicolas Sales, Wyllgner França, Jader Louis - Versao 0.0.1", None))
 
 
+# Define a classe MainWindow que herda de QMainWindow e Ui_PVPI
 class MainWindow(QMainWindow, Ui_PVPI):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
+
+        # Inicializa a interface do usuário definida em Ui_PVPI
         self.setupUi(self)
 
+        # Define estilos CSS para elementos da interface
         self.setStyleSheet("""
             QLabel {
                 color: #ffffff;
@@ -300,36 +314,55 @@ class MainWindow(QMainWindow, Ui_PVPI):
             }
         """)
 
+        # Conecta o evento de clique do botão a uma função
         self.pushButton.clicked.connect(self.on_buttonClick)
 
+    # Função chamada quando o botão é clicado
     def on_buttonClick(self):
+        # Abre uma janela de seleção de diretório e obtém o diretório escolhido pelo usuário
         directory = QFileDialog.getExistingDirectory(self, "Selecionar diretório")
-        self.lineEdit.setText(directory)  # exibe o diretório selecionado no campo de texto
+
+        # Define o diretório selecionado no campo de texto
+        self.lineEdit.setText(directory)
+
+        # Processa as imagens no diretório e abre a galeria de imagens
         process_images(directory)
         self.openImageGallery(directory)
 
+    # Função para abrir a galeria de imagens
     def openImageGallery(self, directory):
+        # Converte imagens JPG para PNG no diretório selecionado
         jpg_to_png(directory)
+
+        # Verifica se o diretório existe
         if os.path.exists(directory):
             # Lista de extensões de arquivo de imagem válidas
-            valid_image_extensions = [".jpg", ".jpeg", ".png", ".bmp", ".tiff",
-                                      ".gif"]  # você pode adicionar ou remover tipos de arquivo conforme necessário
+            valid_image_extensions = [".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".gif"]
 
             # Obtém todos os arquivos no diretório e filtra por extensões de arquivo de imagem
             image_paths = [os.path.join(directory, f) for f in os.listdir(directory)
                            if os.path.isfile(os.path.join(directory, f)) and any(
                     f.lower().endswith(ext) for ext in valid_image_extensions)]
 
+            # Verifica se há imagens para exibir
             if image_paths:
+                # Cria uma instância da classe ImageGallery com os caminhos das imagens
                 self.gallery = ImageGallery(image_paths)
+
+                # Exibe a galeria de imagens
                 self.gallery.show()
-                self.close()  # fecha a janela principal
+
+                # Fecha a janela principal
+                self.close()
             else:
+                # Exibe uma mensagem de aviso se não houver imagens no diretório
                 QMessageBox.warning(self, "Sem imagens", "Não há imagens no diretório selecionado.")
         else:
+            # Exibe uma mensagem de aviso se o diretório selecionado não existir
             QMessageBox.warning(self, "Diretório não encontrado", "O diretório selecionado não existe.")
 
 
+# Função para formatar informações de trackers a partir de um texto em tjpg_text
 def format_trackers_from_tjpg(tjpg_text):
     # Divide o texto usando '#' como delimitador para obter os trackers individuais
     trackers = tjpg_text.split('#')
@@ -366,12 +399,19 @@ def format_trackers_from_tjpg(tjpg_text):
         return "\n\nNenhum Tracker encontrado."
 
 
-
+# Bloco de código principal
 if __name__ == "__main__":
+    # Cria uma instância de QApplication
     app = QApplication(sys.argv)
+
+    # Define um tema escuro para a aplicação (supondo que a função set_dark_theme exista)
     set_dark_theme(app)
+
+    # Cria uma instância da classe MainWindow
     mainWin = MainWindow()
 
+    # Exibe a janela principal
     mainWin.show()
 
+    # Inicia o loop de eventos da aplicação
     sys.exit(app.exec())
