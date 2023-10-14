@@ -17,7 +17,7 @@ def detect_inconsistent_texture(image, threshold=5000, limit=5):
     else:
         return False
 
-def detect_repetitive_patterns(image, threshold=4):
+def detect_lack_of_edges(image, threshold=4):
     # Converter a imagem em escala de cinza
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -67,14 +67,13 @@ import cv2
 
 def iaChecker(image_path):
     # Carregar a imagem
-    print("IACHECKEEEEEEEEEEEEEEEEEEEEER")
     image = cv2.imread(image_path)
     weight = 0
     output_string = ""
 
     # Realizar as detecções
     inconsistent_texture = detect_inconsistent_texture(image)
-    repetitive_patterns = detect_repetitive_patterns(image)
+    repetitive_patterns = detect_lack_of_edges(image)
     vibrant_colors = detect_vibrant_colors(image)
     resolutionAnalysis = resolutionChecker(image)
 
